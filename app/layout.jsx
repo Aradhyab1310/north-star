@@ -1,17 +1,16 @@
 import "./globals.css";
+import SidebarLayout from "@/components/Sidebar"; // new client component
 
 export const metadata = {
-  title: "North Star"
+  title: "North Star",
+  description: "Academic Planner",
 };
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body>
-        <div className={"bg-zinc-800 text-white text-xs px-3 py-1"}>
-          Root layout (Public)  - testing
-        </div>
-        {children}
+        <SidebarLayout>{children}</SidebarLayout>
       </body>
     </html>
   );
