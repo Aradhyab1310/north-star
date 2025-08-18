@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-// keep your current import path; you used "@/lib/supabase/client"
-import { supabase } from "@/lib/supabase/client";
+import { getSupabase } from "@/lib/supabase/client";
+const supabase = getSupabase();
+
 
 export default function DashboardPage() {
   const [courses, setCourses] = useState([]);

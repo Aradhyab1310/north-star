@@ -1,6 +1,8 @@
 "use client";
 
-import { supabase } from "@/lib/supabase/client";
+import { getSupabase } from "@/lib/supabase/client";
+const supabase = getSupabase();
+
 import Link from "next/link";
 
 export default function LandingPage() {

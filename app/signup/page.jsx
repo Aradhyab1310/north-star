@@ -1,5 +1,7 @@
 "use client";
-import { supabase } from "@/lib/supabase/client";
+import { getSupabase } from "@/lib/supabase/client";
+const supabase = getSupabase();
+
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
