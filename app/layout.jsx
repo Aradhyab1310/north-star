@@ -1,5 +1,5 @@
 import "./globals.css";
-import SidebarLayout from "@/components/Sidebar"; // new client component
+import AppShell from "@/components/AppShell";
 
 export const metadata = {
   title: "North Star",
@@ -10,7 +10,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body>
-        <SidebarLayout>{children}</SidebarLayout>
+        <AppShell>{children}</AppShell>
       </body>
     </html>
   );
