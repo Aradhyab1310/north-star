@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import MiniFocusBadge from "@/components/focus/MiniFocusBadge";
 
 export default function SidebarLayout({ children }) {
   const pathname = usePathname();
@@ -29,6 +30,7 @@ export default function SidebarLayout({ children }) {
           {link("/courses", "Courses")}
           {link("/focus", "Focus Mode")}
           {link("/settings", "Settings")}
+          <MiniFocusBadge />
         </nav>
       </aside>
       <main className="col-span-9 lg:col-span-10 p-6">{children}</main>

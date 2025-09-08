@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { getSupabase } from "@/lib/supabase/client";
 import TaskForm from "@/components/tasks/TaskForm";
+import { useSearchParams } from "next/navigation";
 
 const supabase = getSupabase();
 
@@ -11,6 +12,13 @@ export default function TasksPage() {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState("");
+  
+
+  // ---- Filters / search UI state ----
+  const [q, setQ] = useState("");
+  const [statusView, setStatusView] = useState("all"); // all | todo | doing | done
+  const [courseFilter, setCourseFilter] = useState("all"); // course id or "all"
+  const [priorityFilter, setPriorityFilter] = useState("all"); // all | low | medium | high
 
   async function fetchAll({ silent = false } = {}) {
     if (!silent) { setErr(""); setLoading(true); }
@@ -27,33 +35,18 @@ export default function TasksPage() {
 
   useEffect(() => { fetchAll(); }, []);
 
-  // ---------- Optimistic handlers (no full reload) ----------
+  // Optimistic toggles / deletes
   async function toggleTaskStatus(id, nextStatus) {
-    // optimistic: flip in local state
     const prev = tasks;
-    setTasks(prev =>
-      prev.map(t => (t.id === id ? { ...t, status: nextStatus } : t))
-    );
-
-    // background save
+    setTasks(prev.map(t => (t.id === id ? { ...t, status: nextStatus } : t)));
     const { error } = await supabase.from("tasks").update({ status: nextStatus }).eq("id", id);
-    if (error) {
-      // rollback on failure
-      setTasks(prev);
-      alert("Failed to update status: " + error.message);
-    }
+    if (error) { setTasks(prev); alert("Failed to update: " + error.message); }
   }
-
   async function deleteTask(id) {
-    // optimistic: remove locally
     const prev = tasks;
     setTasks(prev.filter(t => t.id !== id));
-
     const { error } = await supabase.from("tasks").delete().eq("id", id);
-    if (error) {
-      setTasks(prev); // rollback
-      alert("Failed to delete: " + error.message);
-    }
+    if (error) { setTasks(prev); alert("Failed to delete: " + error.message); }
   }
 
   const courseById = useMemo(() => {
@@ -61,6 +54,24 @@ export default function TasksPage() {
     for (const c of courses) m.set(c.id, c);
     return m;
   }, [courses]);
+
+  // Apply filters
+  const filtered = useMemo(() => {
+    const needle = q.trim().toLowerCase();
+    return tasks.filter(t => {
+      const hits =
+        !needle ||
+        t.title?.toLowerCase().includes(needle) ||
+        t.description?.toLowerCase().includes(needle);
+
+      if (!hits) return false;
+      if (statusView !== "all" && t.status !== statusView) return false;
+      if (priorityFilter !== "all" && t.priority !== priorityFilter) return false;
+      if (courseFilter !== "all" && t.course_id !== courseFilter) return false;
+
+      return true;
+    });
+  }, [tasks, q, statusView, priorityFilter, courseFilter]);
 
   if (loading) return <div className="p-6">Loading…</div>;
   if (err) return <div className="p-6 text-rose-600">Error: {err}</div>;
@@ -73,12 +84,64 @@ export default function TasksPage() {
         <TaskForm onSaved={() => fetchAll({ silent: true })} courses={courses} />
       </header>
 
+      {/* Controls row (styled similar to Courses) */}
+      <div className="flex flex-wrap items-center gap-3">
+        {/* Search */}
+        <input
+          className="rounded-full border px-4 py-2"
+          placeholder="Search"
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+        />
+
+        {/* Status pills */}
+        <div className="flex items-center gap-2">
+          {["all", "todo", "doing", "done"].map((v) => (
+            <button
+              key={v}
+              onClick={() => setStatusView(v)}
+              className={`rounded-full border px-4 py-1.5 text-sm ${
+                statusView === v ? "bg-zinc-900 text-white" : "hover:bg-zinc-50"
+              }`}
+            >
+              {v === "all" ? "All" :
+               v === "todo" ? "To-do" :
+               v === "doing" ? "In progress" : "Done"}
+            </button>
+          ))}
+        </div>
+
+        {/* Course filter */}
+        <select
+          className="rounded-full border px-4 py-1.5 text-sm"
+          value={courseFilter}
+          onChange={(e) => setCourseFilter(e.target.value)}
+        >
+          <option value="all">All courses</option>
+          {courses.map(c => (
+            <option key={c.id} value={c.id}>{c.name}</option>
+          ))}
+        </select>
+
+        {/* Priority filter */}
+        <select
+          className="rounded-full border px-4 py-1.5 text-sm"
+          value={priorityFilter}
+          onChange={(e) => setPriorityFilter(e.target.value)}
+        >
+          <option value="all">Any priority</option>
+          <option value="high">High</option>
+          <option value="medium">Medium</option>
+          <option value="low">Low</option>
+        </select>
+      </div>
+
       {/* List */}
-      {tasks.length === 0 ? (
+      {filtered.length === 0 ? (
         <EmptyState />
       ) : (
         <ul className="divide-y rounded border bg-white">
-          {tasks.map((t) => (
+          {filtered.map((t) => (
             <TaskRow
               key={t.id}
               task={t}
@@ -98,7 +161,6 @@ export default function TasksPage() {
 /* ---------- Row ---------- */
 function TaskRow({ task, course, courses, onToggle, onDelete, onEdited }) {
   const next = task.status === "done" ? "todo" : "done";
-
   return (
     <li className="flex items-center gap-3 px-4 py-3">
       <button
@@ -117,15 +179,10 @@ function TaskRow({ task, course, courses, onToggle, onDelete, onEdited }) {
         <div className="text-xs text-zinc-500">
           {course ? (
             <span className="inline-flex items-center gap-1">
-              <span
-                className="inline-block h-2 w-2 rounded-full border"
-                style={{ background: course.color }}
-              />
+              <span className="inline-block h-2 w-2 rounded-full border" style={{ background: course.color }} />
               {course.name}
             </span>
-          ) : (
-            "No course"
-          )}
+          ) : ("No course")}
           {" · "}
           {formatDue(task.due_date, task.due_time)}
         </div>
@@ -142,9 +199,7 @@ function TaskRow({ task, course, courses, onToggle, onDelete, onEdited }) {
           triggerLabel="Edit"
           triggerClass="text-sm text-zinc-600 hover:underline"
         />
-        <button onClick={onDelete} className="text-sm text-rose-600 hover:underline">
-          Delete
-        </button>
+        <button onClick={onDelete} className="text-sm text-rose-600 hover:underline">Delete</button>
       </div>
     </li>
   );
@@ -166,9 +221,7 @@ function Badge({ kind, value }) {
       ? "bg-blue-100 text-blue-700 border-blue-200"
       : "bg-zinc-100 text-zinc-700 border-zinc-200";
   return (
-    <span className={`text-xs rounded border px-2 py-1 capitalize ${cls}`}>
-      {value}
-    </span>
+    <span className={`text-xs rounded border px-2 py-1 capitalize ${cls}`}>{value}</span>
   );
 }
 
@@ -182,8 +235,8 @@ function formatDue(date, time) {
 function EmptyState() {
   return (
     <div className="grid place-items-center rounded border bg-white p-10 text-center">
-      <div className="text-lg font-medium">No tasks yet.</div>
-      <p className="mt-1 text-sm text-zinc-500">Use “New Task” to add your first item.</p>
+      <div className="text-lg font-medium">No tasks match your filters.</div>
+      <p className="mt-1 text-sm text-zinc-500">Adjust filters or add a new task.</p>
     </div>
   );
 }

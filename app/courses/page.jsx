@@ -4,6 +4,8 @@ import { useEffect, useMemo, useState } from "react";
 import { getSupabase } from "@/lib/supabase/client";
 import CourseCard from "@/components/courses/CourseCard";
 import CourseForm from "@/components/courses/CourseForm";
+import Link from "next/link";
+
 
 const supabase = getSupabase();
 
@@ -147,13 +149,17 @@ export default function CoursesPage() {
             </p>
           )}
         </div>
-      ) : (
-        <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {visible.map((c) => (
-            <CourseCard key={c.id} course={c} onRefresh={fetchCourses} />
-          ))}
-        </ul>
-      )}
-    </div>
+          ) : (
+            <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {visible.map((c) => (
+                <li key={c.id}>
+                  <Link href={`/courses/${c.id}`} className="block transition hover:-translate-y-0.5 hover:shadow-md">
+                      <CourseCard course={c} onRefresh={fetchCourses} />
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
   );
 }
