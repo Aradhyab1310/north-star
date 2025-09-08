@@ -1,26 +1,106 @@
 @import "tailwindcss";
 
+/* -----------------------------
+   Brand constants (always-on)
+   ----------------------------- */
 :root {
-  --background: #D9D7B6;
-  --foreground: #D9D7B6;
+  --bg: #FFFADB;            /* page background */
+  --text: #c9bcbc;          /* default text */
+  --accent: #B3841A;        /* headers, small section headers, borders */
+
+  /* Card fills (theme-controlled) */
+  --card-light: #ffffff;           /* light theme fill */
+  --card-dark: rgba(38, 35, 35, 0.08);   /* dark theme fill (subtle) */
+
+  --card-border: color-mix(in oklab, var(--accent) 30%, transparent);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* Theming: only the card fill changes */
+:root { --card: var(--card-light); }
+.dark { --card: var(--card-dark); }
+
+/* Base */
+html, body { background: var(--bg); color: var(--text); }
+body { transition: background-color .3s, color .3s; }
+
+/* Headings */
+.heading, h1, h2 {
+  font-family: var(--font-heading, ui-rounded, "Quicksand", "Nunito", system-ui, -apple-system, Segoe UI, Roboto, sans-serif);
+  color: var(--accent);
+}
+h1 { font-size: clamp(1.75rem, 2.5vw, 2.25rem); font-weight: 700; }
+h2 { font-size: clamp(1.25rem, 1.8vw, 1.5rem);   font-weight: 700; }
+
+/* Section title */
+.section-title { color: var(--accent); font-weight: 600; letter-spacing: .02em; }
+
+/* Card helper */
+.card {
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  border-radius: .75rem;
+  padding: 1rem;
+  transition: background-color .25s, border-color .25s, box-shadow .2s;
+}
+.card.hoverable:hover { box-shadow: 0 6px 20px rgba(0,0,0,.10); transform: translateY(-1px); }
+
+
+/* --- Accent helpers that respect theme --- */
+
+/* Titles in lists (e.g., task name) */
+.accent-text { color: var(--accent); }
+.dark .accent-text { color: #ffffff; }
+
+/* Search/select placeholders */
+.input-accent::placeholder {
+  /* accenty placeholder in light */
+  color: color-mix(in oklab, var(--accent) 65%, transparent);
+  opacity: 1; /* Safari */
+}
+.dark .input-accent::placeholder {
+  /* readable white-ish in dark */
+  color: #ffffffb3;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #FFFADB;
-    --foreground: #878672;
-  }
+/* Pills (filters) */
+.pill {
+  background: color-mix(in oklab, var(--accent) 14%, #fff);
+  color: var(--text);
+  border: 1px solid var(--accent);
+  border-radius: 9999px;
+  padding: .375rem .875rem;
+  line-height: 1;
+  transition: background-color .2s, color .2s, border-color .2s;
+}
+.pill:hover { background: color-mix(in oklab, var(--accent) 22%, #fff); }
+
+.pill-active {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+.dark .pill {
+  /* a bit stronger tint on dark surfaces */
+  background: color-mix(in oklab, var(--accent) 30%, transparent);
+  color: #fff;
+  border-color: color-mix(in oklab, var(--accent) 70%, #000);
 }
+.dark .pill:hover {
+  background: color-mix(in oklab, var(--accent) 42%, transparent);
+}
+
+/* Rounded selects to look like pills */
+.select-accent {
+  background: var(--card);
+  border: 1px solid var(--accent);
+  border-radius: 9999px;
+  padding: .5rem 1rem;
+  color: var(--text);
+}
+
+/* Optional: make the "first/default" option look placeholdery in the dropdown */
+.select-accent option[disabled] {
+  color: color-mix(in oklab, var(--accent) 65%, transparent);
+}
+

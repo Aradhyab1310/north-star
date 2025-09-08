@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import MiniFocusBadge from "@/components/focus/MiniFocusBadge";
+import ThemeToggle from "./theme/ThemeToggle";
 
 export default function SidebarLayout({ children }) {
   const pathname = usePathname();
@@ -17,6 +18,19 @@ export default function SidebarLayout({ children }) {
       {label}
     </Link>
   );
+
+function Sidebar() {
+  return (
+    <aside className="border-r p-3">
+      {/* …nav links… */}
+      <div className="mt-3">
+        <ThemeToggle compact />
+      </div>
+    </aside>
+  );
+}
+
+
 
   return (
     <div className="min-h-screen grid grid-cols-12">

@@ -213,21 +213,21 @@ function QuickAdd({ onAdded, courses, defaultDate }) {
       <div className="mb-2 text-sm font-semibold uppercase tracking-wide text-zinc-500">Quick Add</div>
       <div className="grid gap-2">
         <input
-          className="rounded-lg border px-3 py-2"
+          className="rounded-lg border px-3 py-2 input-accent"
           placeholder="Task title"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
         />
         <div className="grid grid-cols-2 gap-2">
-          <input type="date" className="rounded-lg border px-3 py-2" value={date} onChange={(e)=>setDate(e.target.value)} />
-          <input type="time" className="rounded-lg border px-3 py-2" value={time} onChange={(e)=>setTime(e.target.value)} />
+          <input type="date" className="rounded-lg border px-3 py-2 input-accent" value={date} onChange={(e)=>setDate(e.target.value)} />
+          <input type="time" className="rounded-lg border px-3 py-2 input-accent" value={time} onChange={(e)=>setTime(e.target.value)} />
         </div>
         <div className="grid grid-cols-2 gap-2">
-          <select className="rounded-lg border px-3 py-2" value={courseId} onChange={(e)=>setCourseId(e.target.value)}>
+          <select className="rounded-lg border px-3 py-2 select-accent" value={courseId} onChange={(e)=>setCourseId(e.target.value)}>
             <option value="none">No course</option>
             {courses.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
           </select>
-          <select className="rounded-lg border px-3 py-2" value={priority} onChange={(e)=>setPriority(e.target.value)}>
+          <select className="rounded-lg border px-3 py-2 select-accent" value={priority} onChange={(e)=>setPriority(e.target.value)}>
             <option value="high">High</option>
             <option value="medium">Medium</option>
             <option value="low">Low</option>

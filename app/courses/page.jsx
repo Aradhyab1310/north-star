@@ -102,7 +102,7 @@ export default function CoursesPage() {
         <div className="flex flex-wrap items-center gap-3">
           {/* Search */}
           <input
-            className="rounded-full border px-4 py-2"
+            className="rounded-full border px-4 py-2 input-accent"
             placeholder="Search"
             value={q}
             onChange={(e) => setQ(e.target.value)}
@@ -114,9 +114,7 @@ export default function CoursesPage() {
               <button
                 key={v}
                 onClick={() => setView(v)}
-                className={`rounded-full border px-4 py-1.5 text-sm ${
-                  view === v ? "bg-zinc-900 text-white" : "hover:bg-zinc-50"
-                }`}
+                className={`pill ${view === v ? "pill-active" : ""}`}
               >
                 {v === "all"
                   ? "All"
@@ -128,6 +126,7 @@ export default function CoursesPage() {
               </button>
             ))}
           </div>
+
         </div>
       </header>
 

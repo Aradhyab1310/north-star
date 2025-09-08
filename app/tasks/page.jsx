@@ -88,7 +88,7 @@ export default function TasksPage() {
       <div className="flex flex-wrap items-center gap-3">
         {/* Search */}
         <input
-          className="rounded-full border px-4 py-2"
+          className="rounded-full border px-4 py-2 input-accent"
           placeholder="Search"
           value={q}
           onChange={(e) => setQ(e.target.value)}
@@ -100,32 +100,26 @@ export default function TasksPage() {
             <button
               key={v}
               onClick={() => setStatusView(v)}
-              className={`rounded-full border px-4 py-1.5 text-sm ${
-                statusView === v ? "bg-zinc-900 text-white" : "hover:bg-zinc-50"
-              }`}
+              className={`pill text-sm ${statusView === v ? "pill-active" : ""}`}
             >
-              {v === "all" ? "All" :
-               v === "todo" ? "To-do" :
-               v === "doing" ? "In progress" : "Done"}
+              {v === "all" ? "All" : v === "todo" ? "To-do" : v === "doing" ? "In progress" : "Done"}
             </button>
-          ))}
+                    ))}
         </div>
 
         {/* Course filter */}
         <select
-          className="rounded-full border px-4 py-1.5 text-sm"
+          className="select-accent text-sm"
           value={courseFilter}
           onChange={(e) => setCourseFilter(e.target.value)}
         >
           <option value="all">All courses</option>
-          {courses.map(c => (
-            <option key={c.id} value={c.id}>{c.name}</option>
-          ))}
+          {courses.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
         </select>
 
         {/* Priority filter */}
         <select
-          className="rounded-full border px-4 py-1.5 text-sm"
+          className="select-accent text-sm"
           value={priorityFilter}
           onChange={(e) => setPriorityFilter(e.target.value)}
         >
@@ -175,7 +169,7 @@ function TaskRow({ task, course, courses, onToggle, onDelete, onEdited }) {
       </button>
 
       <div className="flex-1">
-        <div className="font-medium">{task.title}</div>
+        <div className="font-medium accent-text">{task.title}</div>
         <div className="text-xs text-zinc-500">
           {course ? (
             <span className="inline-flex items-center gap-1">

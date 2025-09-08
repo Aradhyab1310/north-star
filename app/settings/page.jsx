@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { getSupabase } from "@/lib/supabase/client";
+import ThemeToggle from "@/components/theme/ThemeToggle";
 
 const supabase = getSupabase();
 
@@ -13,6 +14,7 @@ function applyTheme(theme) {
   const isDark = theme === "dark" || (theme === "system" && sysDark);
   root.classList.toggle("dark", isDark);
 }
+
 
 export default function SettingsPage() {
   const [loading, setLoading] = useState(true);
@@ -140,6 +142,16 @@ export default function SettingsPage() {
         <h1 className="text-2xl font-bold">Settings</h1>
         <p className="text-sm text-zinc-500">Manage your profile, appearance and preferences.</p>
       </header>
+
+      <div className="space-y-6">
+        <h1 className="heading text-2xl">Settings</h1>
+
+        <section className="card">
+          <h2 className="section-title mb-3">Appearance</h2>
+          <ThemeToggle />
+        </section>
+      {/* …rest… */}
+    </div>
 
       {/* Profile */}
       <section className="rounded-2xl border bg-white p-5 shadow-sm dark:bg-zinc-900">
